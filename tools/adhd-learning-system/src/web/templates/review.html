@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADHD Learning System - 복습</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Marked.js for Markdown rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        .review-page {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: var(--spacing-xl);
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-lg);
+            flex-wrap: wrap;
+            gap: var(--spacing-md);
+        }
+
+        .review-controls {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .review-settings {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            background-color: var(--bg-secondary);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: 8px;
+            font-size: 0.875rem;
+        }
+
+        .review-settings label {
+            color: var(--text-secondary);
+        }
+
+        .review-settings select, .review-settings input {
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 4px 8px;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: var(--bg-tertiary);
+            border-radius: 4px;
+            margin-bottom: var(--spacing-lg);
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success), var(--primary));
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        /* Card Navigation */
+        .card-navigation {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .nav-btn {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: var(--spacing-sm) var(--spacing-md);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .card-indicator {
+            display: flex;
+            gap: 4px;
+            max-width: 300px;
+            overflow-x: auto;
+            padding: var(--spacing-xs);
+        }
+
+        .card-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--bg-tertiary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .card-dot.current {
+            background-color: var(--primary);
+            transform: scale(1.3);
+        }
+
+        .card-dot.reviewed {
+            background-color: var(--success);
+        }
+
+        .card-dot.skipped {
+            background-color: var(--warning);
+        }
+
+        .flashcard {
+            background-color: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 40px;
+            min-height: 350px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid var(--border);
+            margin-bottom: var(--spacing-xl);
+            position: relative;
+        }
+
+        .flashcard:hover {
+            border-color: var(--primary);
+            box-shadow: 0 0 30px rgba(99, 102, 241, 0.2);
+        }
+
+        .flashcard.flipped {
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+        }
+
+        .card-type-badge {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            padding: 4px 10px;
+            background-color: var(--bg-tertiary);
+            border-radius: 12px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .card-number {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .card-question {
+            font-size: 1.5rem;
+            font-weight: 600;
+            line-height: 1.6;
+            margin-bottom: var(--spacing-lg);
+            max-width: 100%;
+        }
+
+        /* Markdown Styling */
+        .card-question.markdown-content,
+        .answer-content.markdown-content {
+            text-align: left;
+            width: 100%;
+        }
+
+        .markdown-content h1, .markdown-content h2, .markdown-content h3 {
+            margin-top: 0;
+            margin-bottom: var(--spacing-md);
+            color: var(--text-primary);
+        }
+
+        .markdown-content code {
+            background-color: var(--bg-tertiary);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+        }
+
+        .markdown-content pre {
+            background-color: var(--bg-tertiary);
+            padding: var(--spacing-md);
+            border-radius: 8px;
+            overflow-x: auto;
+            text-align: left;
+        }
+
+        .markdown-content pre code {
+            background: none;
+            padding: 0;
+        }
+
+        .markdown-content ul, .markdown-content ol {
+            text-align: left;
+            padding-left: 20px;
+            margin: var(--spacing-md) 0;
+        }
+
+        .markdown-content li {
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .markdown-content blockquote {
+            border-left: 3px solid var(--primary);
+            padding-left: var(--spacing-md);
+            margin: var(--spacing-md) 0;
+            color: var(--text-secondary);
+            text-align: left;
+        }
+
+        .markdown-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: var(--spacing-md) 0;
+        }
+
+        .markdown-content th, .markdown-content td {
+            border: 1px solid var(--border);
+            padding: var(--spacing-sm);
+            text-align: left;
+        }
+
+        .markdown-content th {
+            background-color: var(--bg-tertiary);
+        }
+
+        .card-hint {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .card-answer {
+            display: none;
+            margin-top: var(--spacing-xl);
+            padding-top: var(--spacing-xl);
+            border-top: 2px solid var(--border);
+            width: 100%;
+        }
+
+        .flashcard.flipped .card-answer {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .answer-content {
+            font-size: 1.125rem;
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
+
+        .card-tags {
+            display: flex;
+            gap: var(--spacing-sm);
+            margin-top: var(--spacing-lg);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            padding: var(--spacing-xs) var(--spacing-sm);
+            background-color: var(--bg-tertiary);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .rating-section {
+            display: none;
+        }
+
+        .rating-section.visible {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .rating-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--spacing-md);
+        }
+
+        .rating-btn {
+            padding: var(--spacing-lg);
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .rating-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .rating-btn .rating-icon {
+            font-size: 1.5rem;
+        }
+
+        .rating-btn .rating-label {
+            font-size: 0.875rem;
+        }
+
+        .rating-btn .rating-interval {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+
+        .rating-btn.again {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+
+        .rating-btn.hard {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+        }
+
+        .rating-btn.good {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        .rating-btn.easy {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: white;
+        }
+
+        .skip-btn {
+            margin-top: var(--spacing-md);
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: var(--spacing-sm) var(--spacing-lg);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .skip-btn:hover {
+            border-color: var(--warning);
+            color: var(--warning);
+        }
+
+        .session-stats {
+            display: flex;
+            justify-content: center;
+            gap: var(--spacing-xl);
+            margin-top: var(--spacing-xl);
+            padding: var(--spacing-lg);
+            background-color: var(--bg-secondary);
+            border-radius: 12px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-item .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-item .label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .completion-screen {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .completion-screen.visible {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .completion-icon {
+            font-size: 4rem;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .completion-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .completion-message {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .xp-earned {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-md) var(--spacing-lg);
+            background: linear-gradient(135deg, var(--warning), #d97706);
+            border-radius: 20px;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .back-btn {
+            display: inline-block;
+            padding: var(--spacing-md) var(--spacing-xl);
+            background-color: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background-color 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 키보드 단축키 힌트 */
+        .keyboard-hints {
+            display: flex;
+            justify-content: center;
+            gap: var(--spacing-lg);
+            margin-top: var(--spacing-lg);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            flex-wrap: wrap;
+        }
+
+        .key-hint {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+
+        .key {
+            padding: 2px 6px;
+            background-color: var(--bg-tertiary);
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
+        @media (max-width: 768px) {
+            .rating-buttons {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .review-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .card-indicator {
+                max-width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 사이드바 -->
+        <nav class="sidebar">
+            <div class="logo">
+                <span class="logo-icon">🧠</span>
+                <span class="logo-text">ADHD Learn</span>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="/">
+                        <span class="nav-icon">📊</span>
+                        <span>대시보드</span>
+                    </a>
+                </li>
+                <li class="nav-item active">
+                    <a href="/review">
+                        <span class="nav-icon">📝</span>
+                        <span>복습</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/knowledge">
+                        <span class="nav-icon">💡</span>
+                        <span>지식 추가</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/library">
+                        <span class="nav-icon">📚</span>
+                        <span>라이브러리</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/schedule">
+                        <span class="nav-icon">📅</span>
+                        <span>스케줄</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- 메인 콘텐츠 -->
+        <main class="main-content">
+            <div class="review-page">
+                <div class="review-header">
+                    <h1>📝 복습 세션</h1>
+                    <div class="review-controls">
+                        <div class="review-settings">
+                            <label for="cardLimit">카드 수:</label>
+                            <select id="cardLimit" onchange="updateCardLimit()">
+                                <option value="10">10장</option>
+                                <option value="20" selected>20장</option>
+                                <option value="30">30장</option>
+                                <option value="50">50장</option>
+                                <option value="100">100장</option>
+                                <option value="0">전체</option>
+                            </select>
+                        </div>
+                        <div class="session-info">
+                            <span id="cardCount">0 / 0</span> 카드
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 진행률 -->
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+
+                <!-- 빈 상태 -->
+                <div class="empty-state" id="emptyState" style="display: none;">
+                    <div class="empty-icon">✨</div>
+                    <h2>복습할 카드가 없습니다!</h2>
+                    <p style="color: var(--text-secondary); margin-top: var(--spacing-md);">
+                        오늘의 복습을 모두 완료했거나 새 카드를 추가해보세요.
+                    </p>
+                    <a href="/knowledge" class="back-btn" style="margin-top: var(--spacing-xl);">
+                        💡 지식 추가하기
+                    </a>
+                </div>
+
+                <!-- 플래시카드 -->
+                <div id="flashcardContainer">
+                    <!-- Card Navigation -->
+                    <div class="card-navigation">
+                        <button class="nav-btn" id="prevBtn" onclick="navigateCard(-1)" disabled>
+                            ← 이전
+                        </button>
+                        <div class="card-indicator" id="cardIndicator"></div>
+                        <button class="nav-btn" id="nextBtn" onclick="navigateCard(1)">
+                            다음 →
+                        </button>
+                    </div>
+
+                    <div class="flashcard" id="flashcard" onclick="flipCard()">
+                        <div class="card-type-badge" id="cardTypeBadge">복습</div>
+                        <div class="card-number" id="cardNumber">#1</div>
+                        <div class="card-question markdown-content" id="cardQuestion">로딩 중...</div>
+                        <div class="card-hint" id="cardHint">클릭하거나 스페이스바를 눌러 답변 확인</div>
+                        <div class="card-answer">
+                            <div class="answer-content markdown-content" id="cardAnswer"></div>
+                            <div class="card-tags" id="cardTags"></div>
+                        </div>
+                    </div>
+
+                    <!-- 평가 버튼 -->
+                    <div class="rating-section" id="ratingSection">
+                        <div class="rating-buttons">
+                            <button class="rating-btn again" onclick="rateCard(1)">
+                                <span class="rating-icon">😵</span>
+                                <span class="rating-label">다시</span>
+                                <span class="rating-interval">&lt;1분</span>
+                            </button>
+                            <button class="rating-btn hard" onclick="rateCard(2)">
+                                <span class="rating-icon">😓</span>
+                                <span class="rating-label">어려움</span>
+                                <span class="rating-interval" id="hardInterval">10분</span>
+                            </button>
+                            <button class="rating-btn good" onclick="rateCard(3)">
+                                <span class="rating-icon">😊</span>
+                                <span class="rating-label">좋음</span>
+                                <span class="rating-interval" id="goodInterval">1일</span>
+                            </button>
+                            <button class="rating-btn easy" onclick="rateCard(4)">
+                                <span class="rating-icon">🤩</span>
+                                <span class="rating-label">쉬움</span>
+                                <span class="rating-interval" id="easyInterval">3일</span>
+                            </button>
+                        </div>
+                        <button class="skip-btn" onclick="skipCard()">
+                            나중에 복습 (S)
+                        </button>
+                        <div class="keyboard-hints">
+                            <span class="key-hint"><span class="key">Space</span> 뒤집기</span>
+                            <span class="key-hint"><span class="key">1-4</span> 평가</span>
+                            <span class="key-hint"><span class="key">←/→</span> 이동</span>
+                            <span class="key-hint"><span class="key">S</span> 스킵</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 세션 통계 -->
+                <div class="session-stats" id="sessionStats">
+                    <div class="stat-item">
+                        <div class="value" id="reviewedCount">0</div>
+                        <div class="label">복습 완료</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="value" id="correctRate">0%</div>
+                        <div class="label">정확도</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="value" id="earnedXP">0</div>
+                        <div class="label">획득 XP</div>
+                    </div>
+                </div>
+
+                <!-- 완료 화면 -->
+                <div class="completion-screen" id="completionScreen">
+                    <div class="completion-icon">🎉</div>
+                    <div class="completion-title">세션 완료!</div>
+                    <div class="completion-message" id="completionMessage">
+                        오늘의 복습을 모두 완료했습니다.
+                    </div>
+                    <div class="xp-earned">
+                        ⭐ <span id="totalXP">0</span> XP 획득!
+                    </div>
+                    <br><br>
+                    <a href="/" class="back-btn">대시보드로 돌아가기</a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 상태
+        const state = {
+            cards: [],
+            currentIndex: 0,
+            reviewed: 0,
+            correct: 0,
+            totalXP: 0,
+            isFlipped: false,
+            cardLimit: 20,
+            cardStatus: [] // 'pending', 'reviewed', 'skipped'
+        };
+
+        // Configure marked.js options
+        if (typeof marked !== 'undefined') {
+            marked.setOptions({
+                breaks: true,
+                gfm: true,
+                sanitize: false
+            });
+        }
+
+        // 초기화
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCards();
+            // Focus on body for keyboard events
+            document.body.focus();
+        });
+
+        // 키보드 단축키 - window level for better capture
+        window.addEventListener('keydown', (e) => {
+            // Ignore if typing in input/textarea
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+                return;
+            }
+
+            // Spacebar for flip
+            if (e.code === 'Space' || e.key === ' ') {
+                e.preventDefault();
+                e.stopPropagation();
+                flipCard();
+                return false;
+            }
+
+            // Number keys 1-4 for rating
+            if (e.key >= '1' && e.key <= '4' && state.isFlipped) {
+                e.preventDefault();
+                rateCard(parseInt(e.key));
+            }
+
+            // Arrow keys for navigation
+            if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                navigateCard(-1);
+            }
+            if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                navigateCard(1);
+            }
+
+            // S for skip
+            if (e.key === 's' || e.key === 'S') {
+                e.preventDefault();
+                if (state.isFlipped) {
+                    skipCard();
+                }
+            }
+        }, true);
+
+        // Prevent spacebar scroll
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && e.target === document.body) {
+                e.preventDefault();
+            }
+        });
+
+        function updateCardLimit() {
+            const select = document.getElementById('cardLimit');
+            state.cardLimit = parseInt(select.value);
+            loadCards();
+        }
+
+        async function loadCards() {
+            try {
+                const limit = state.cardLimit || 100;
+                // 복습할 카드와 새 카드 로드
+                const [dueRes, newRes] = await Promise.all([
+                    fetch(`/api/cards/due?limit=${limit}`),
+                    fetch(`/api/cards/new?limit=${Math.ceil(limit * 0.2)}`)
+                ]);
+
+                const dueData = await dueRes.json();
+                const newData = await newRes.json();
+
+                state.cards = [];
+                if (dueData.success) {
+                    state.cards = [...(dueData.data.cards || [])];
+                }
+                if (newData.success) {
+                    state.cards = [...state.cards, ...(newData.data.cards || [])];
+                }
+
+                // Apply limit if set
+                if (state.cardLimit > 0 && state.cards.length > state.cardLimit) {
+                    state.cards = state.cards.slice(0, state.cardLimit);
+                }
+
+                // Initialize card status
+                state.cardStatus = state.cards.map(() => 'pending');
+                state.currentIndex = 0;
+                state.reviewed = 0;
+                state.correct = 0;
+                state.totalXP = 0;
+
+                if (state.cards.length === 0) {
+                    showEmptyState();
+                } else {
+                    buildCardIndicator();
+                    updateCardCount();
+                    showCard();
+                }
+            } catch (error) {
+                console.error('Error loading cards:', error);
+                showEmptyState();
+            }
+        }
+
+        function buildCardIndicator() {
+            const container = document.getElementById('cardIndicator');
+            container.innerHTML = state.cards.map((_, i) =>
+                `<div class="card-dot" data-index="${i}" onclick="goToCard(${i})"></div>`
+            ).join('');
+            updateCardIndicator();
+        }
+
+        function updateCardIndicator() {
+            const dots = document.querySelectorAll('.card-dot');
+            dots.forEach((dot, i) => {
+                dot.classList.remove('current', 'reviewed', 'skipped');
+                if (i === state.currentIndex) {
+                    dot.classList.add('current');
+                } else if (state.cardStatus[i] === 'reviewed') {
+                    dot.classList.add('reviewed');
+                } else if (state.cardStatus[i] === 'skipped') {
+                    dot.classList.add('skipped');
+                }
+            });
+        }
+
+        function goToCard(index) {
+            if (index >= 0 && index < state.cards.length) {
+                state.currentIndex = index;
+                showCard();
+            }
+        }
+
+        function navigateCard(direction) {
+            const newIndex = state.currentIndex + direction;
+            if (newIndex >= 0 && newIndex < state.cards.length) {
+                state.currentIndex = newIndex;
+                showCard();
+            }
+        }
+
+        function showEmptyState() {
+            document.getElementById('flashcardContainer').style.display = 'none';
+            document.getElementById('sessionStats').style.display = 'none';
+            document.getElementById('emptyState').style.display = 'block';
+        }
+
+        function renderMarkdown(text) {
+            if (!text) return '';
+            if (typeof marked !== 'undefined') {
+                try {
+                    return marked.parse(text);
+                } catch (e) {
+                    console.error('Markdown parsing error:', e);
+                    return escapeHtml(text);
+                }
+            }
+            return escapeHtml(text);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showCard() {
+            // Check if all cards are done
+            const pendingCount = state.cardStatus.filter(s => s === 'pending').length;
+            if (pendingCount === 0 && state.reviewed > 0) {
+                showCompletion();
+                return;
+            }
+
+            const card = state.cards[state.currentIndex];
+            if (!card) return;
+
+            // Render with markdown
+            document.getElementById('cardQuestion').innerHTML = renderMarkdown(card.content);
+            document.getElementById('cardAnswer').innerHTML = renderMarkdown(card.answer);
+
+            // Card type badge
+            const isNew = !card.review_count || card.review_count === 0;
+            document.getElementById('cardTypeBadge').textContent = isNew ? '새 카드' : '복습';
+
+            // Card number
+            document.getElementById('cardNumber').textContent = `#${state.currentIndex + 1}`;
+
+            // 태그
+            const tagsContainer = document.getElementById('cardTags');
+            const tags = card.tags || [];
+            tagsContainer.innerHTML = tags.map(tag =>
+                `<span class="tag">#${tag}</span>`
+            ).join('');
+
+            // 리셋 상태
+            document.getElementById('flashcard').classList.remove('flipped');
+            document.getElementById('ratingSection').classList.remove('visible');
+            document.getElementById('cardHint').style.display = 'block';
+            state.isFlipped = false;
+
+            // Update navigation buttons
+            document.getElementById('prevBtn').disabled = state.currentIndex === 0;
+            document.getElementById('nextBtn').disabled = state.currentIndex === state.cards.length - 1;
+
+            updateProgress();
+            updateCardIndicator();
+        }
+
+        function flipCard() {
+            if (!state.isFlipped && state.cards.length > 0) {
+                document.getElementById('flashcard').classList.add('flipped');
+                document.getElementById('ratingSection').classList.add('visible');
+                document.getElementById('cardHint').style.display = 'none';
+                state.isFlipped = true;
+            }
+        }
+
+        function skipCard() {
+            state.cardStatus[state.currentIndex] = 'skipped';
+            updateCardIndicator();
+
+            // Find next pending card
+            const nextPending = findNextPendingCard();
+            if (nextPending !== -1) {
+                state.currentIndex = nextPending;
+                showCard();
+            } else {
+                showCompletion();
+            }
+        }
+
+        function findNextPendingCard() {
+            // First, try forward
+            for (let i = state.currentIndex + 1; i < state.cards.length; i++) {
+                if (state.cardStatus[i] === 'pending') return i;
+            }
+            // Then, try from beginning
+            for (let i = 0; i < state.currentIndex; i++) {
+                if (state.cardStatus[i] === 'pending') return i;
+            }
+            return -1;
+        }
+
+        async function rateCard(rating) {
+            const card = state.cards[state.currentIndex];
+
+            try {
+                const response = await fetch('/api/review', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        card_id: card.card_id,
+                        rating: rating
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    state.reviewed++;
+                    if (rating >= 3) state.correct++;
+                    state.totalXP += result.data.xp_earned || 0;
+                    state.cardStatus[state.currentIndex] = 'reviewed';
+
+                    updateStats();
+                    updateCardIndicator();
+                }
+            } catch (error) {
+                console.error('Error rating card:', error);
+            }
+
+            // Find next pending card
+            const nextPending = findNextPendingCard();
+            if (nextPending !== -1) {
+                state.currentIndex = nextPending;
+                showCard();
+            } else {
+                showCompletion();
+            }
+        }
+
+        function updateCardCount() {
+            const reviewed = state.cardStatus.filter(s => s === 'reviewed').length;
+            document.getElementById('cardCount').textContent =
+                `${reviewed} / ${state.cards.length}`;
+        }
+
+        function updateProgress() {
+            const reviewed = state.cardStatus.filter(s => s === 'reviewed').length;
+            const progress = (reviewed / state.cards.length) * 100;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+            updateCardCount();
+        }
+
+        function updateStats() {
+            document.getElementById('reviewedCount').textContent = state.reviewed;
+            const rate = state.reviewed > 0 ? Math.round((state.correct / state.reviewed) * 100) : 0;
+            document.getElementById('correctRate').textContent = `${rate}%`;
+            document.getElementById('earnedXP').textContent = state.totalXP;
+        }
+
+        function showCompletion() {
+            document.getElementById('flashcardContainer').style.display = 'none';
+            document.getElementById('sessionStats').style.display = 'none';
+
+            const rate = state.reviewed > 0 ? Math.round((state.correct / state.reviewed) * 100) : 0;
+            const skipped = state.cardStatus.filter(s => s === 'skipped').length;
+
+            let message = `${state.reviewed}장 복습, 정확도 ${rate}%`;
+            if (skipped > 0) {
+                message += `, ${skipped}장 스킵`;
+            }
+
+            document.getElementById('completionMessage').textContent = message;
+            document.getElementById('totalXP').textContent = state.totalXP;
+
+            document.getElementById('completionScreen').classList.add('visible');
+        }
+    </script>
+</body>
+</html>

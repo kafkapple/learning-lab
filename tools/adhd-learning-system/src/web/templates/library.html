@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADHD Learning System - 지식 라이브러리</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .library-page {
+            padding: var(--spacing-xl);
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .page-header h1 {
+            font-size: 1.75rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: var(--spacing-md);
+        }
+
+        .btn {
+            padding: var(--spacing-sm) var(--spacing-lg);
+            border-radius: 8px;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--border);
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        /* 개요 통계 */
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .overview-card {
+            background-color: var(--bg-secondary);
+            border-radius: 12px;
+            padding: var(--spacing-lg);
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .overview-icon {
+            font-size: 2rem;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .overview-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .overview-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        /* 메인 레이아웃 */
+        .library-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: var(--spacing-xl);
+        }
+
+        /* 사이드 필터 */
+        .filter-panel {
+            background-color: var(--bg-secondary);
+            border-radius: 12px;
+            padding: var(--spacing-lg);
+            border: 1px solid var(--border);
+            height: fit-content;
+            position: sticky;
+            top: var(--spacing-lg);
+        }
+
+        .filter-title {
+            font-weight: 600;
+            margin-bottom: var(--spacing-md);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .filter-section {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .filter-section h4 {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .filter-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--spacing-sm);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .filter-item:hover {
+            background-color: var(--bg-tertiary);
+        }
+
+        .filter-item.active {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .filter-item .count {
+            background-color: var(--bg-tertiary);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+        }
+
+        .filter-item.active .count {
+            background-color: rgba(255,255,255,0.2);
+        }
+
+        /* 지식 리스트 */
+        .knowledge-list {
+            background-color: var(--bg-secondary);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-lg);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .list-header h3 {
+            font-size: 1rem;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            background-color: var(--bg-tertiary);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .search-box input {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            width: 200px;
+        }
+
+        .search-box input:focus {
+            outline: none;
+        }
+
+        .knowledge-item {
+            display: flex;
+            align-items: center;
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-bottom: 1px solid var(--border);
+            transition: background-color 0.2s ease;
+            cursor: pointer;
+        }
+
+        .knowledge-item:hover {
+            background-color: var(--bg-tertiary);
+        }
+
+        .knowledge-item:last-child {
+            border-bottom: none;
+        }
+
+        .knowledge-type-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bg-tertiary);
+            border-radius: 8px;
+            margin-right: var(--spacing-md);
+            font-size: 1.25rem;
+        }
+
+        .knowledge-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .knowledge-title {
+            font-weight: 500;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .knowledge-meta {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .knowledge-tags {
+            display: flex;
+            gap: var(--spacing-xs);
+            margin-left: var(--spacing-md);
+        }
+
+        .knowledge-tags .tag {
+            padding: 2px 6px;
+            background-color: var(--bg-tertiary);
+            border-radius: 4px;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        .knowledge-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .knowledge-item:hover .knowledge-actions {
+            opacity: 1;
+        }
+
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            background-color: var(--bg-secondary);
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .action-btn.delete:hover {
+            background-color: var(--danger);
+        }
+
+        /* 모달 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: var(--bg-secondary);
+            border-radius: 16px;
+            padding: var(--spacing-xl);
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .modal-header h2 {
+            font-size: 1.25rem;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .form-group {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: var(--spacing-sm);
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: var(--spacing-md);
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-xl);
+        }
+
+        /* 카테고리 관리 */
+        .category-manager {
+            margin-top: var(--spacing-lg);
+            padding-top: var(--spacing-lg);
+            border-top: 1px solid var(--border);
+        }
+
+        .category-input {
+            display: flex;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .category-input input {
+            flex: 1;
+            padding: var(--spacing-sm);
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-primary);
+        }
+
+        .category-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+
+        .category-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--spacing-sm);
+            background-color: var(--bg-tertiary);
+            border-radius: 6px;
+        }
+
+        /* 빈 상태 */
+        .empty-state {
+            text-align: center;
+            padding: var(--spacing-xl) * 2;
+            color: var(--text-secondary);
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: var(--spacing-md);
+        }
+
+        /* 알림 */
+        .toast {
+            position: fixed;
+            bottom: var(--spacing-xl);
+            right: var(--spacing-xl);
+            padding: var(--spacing-md) var(--spacing-lg);
+            background-color: var(--success);
+            color: white;
+            border-radius: 8px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            z-index: 2000;
+        }
+
+        .toast.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .toast.error {
+            background-color: var(--danger);
+        }
+
+        /* 반응형 */
+        @media (max-width: 1024px) {
+            .overview-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .library-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-panel {
+                position: static;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .overview-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-actions {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 사이드바 -->
+        <nav class="sidebar">
+            <div class="logo">
+                <span class="logo-icon">🧠</span>
+                <span class="logo-text">ADHD Learn</span>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="/">
+                        <span class="nav-icon">📊</span>
+                        <span>대시보드</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/review">
+                        <span class="nav-icon">📝</span>
+                        <span>복습</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/knowledge">
+                        <span class="nav-icon">💡</span>
+                        <span>지식 추가</span>
+                    </a>
+                </li>
+                <li class="nav-item active">
+                    <a href="/library">
+                        <span class="nav-icon">📚</span>
+                        <span>라이브러리</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/schedule">
+                        <span class="nav-icon">📅</span>
+                        <span>스케줄</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- 메인 콘텐츠 -->
+        <main class="main-content">
+            <div class="library-page">
+                <!-- 헤더 -->
+                <div class="page-header">
+                    <h1>📚 지식 라이브러리</h1>
+                    <div class="header-actions">
+                        <button class="btn btn-secondary" onclick="exportData()">
+                            📤 내보내기
+                        </button>
+                        <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">
+                            📥 가져오기
+                        </button>
+                        <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(this)">
+                        <a href="/knowledge" class="btn btn-primary">
+                            ➕ 지식 추가
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 개요 통계 -->
+                <div class="overview-grid">
+                    <div class="overview-card">
+                        <div class="overview-icon">📖</div>
+                        <div class="overview-value" id="totalChunks">0</div>
+                        <div class="overview-label">총 지식</div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="overview-icon">🃏</div>
+                        <div class="overview-value" id="totalCards">0</div>
+                        <div class="overview-label">플래시카드</div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="overview-icon">📁</div>
+                        <div class="overview-value" id="totalTopics">0</div>
+                        <div class="overview-label">주제</div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="overview-icon">🏷️</div>
+                        <div class="overview-value" id="totalTypes">0</div>
+                        <div class="overview-label">유형</div>
+                    </div>
+                </div>
+
+                <!-- 메인 레이아웃 -->
+                <div class="library-layout">
+                    <!-- 필터 패널 -->
+                    <div class="filter-panel">
+                        <div class="filter-title">🔍 필터</div>
+
+                        <!-- 유형별 -->
+                        <div class="filter-section">
+                            <h4>유형별</h4>
+                            <div id="typeFilters">
+                                <div class="filter-item active" data-type="all" onclick="filterByType('all')">
+                                    <span>📋 전체</span>
+                                    <span class="count" id="countAll">0</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 주제별 -->
+                        <div class="filter-section">
+                            <h4>주제별</h4>
+                            <div id="topicFilters">
+                                <!-- 동적 생성 -->
+                            </div>
+                        </div>
+
+                        <!-- 우선순위별 -->
+                        <div class="filter-section">
+                            <h4>우선순위</h4>
+                            <div id="priorityFilters">
+                                <!-- 동적 생성 -->
+                            </div>
+                        </div>
+
+                        <!-- 카테고리 관리 -->
+                        <div class="category-manager">
+                            <div class="filter-title">⚙️ 카테고리 관리</div>
+                            <div class="category-input">
+                                <input type="text" id="newCategoryName" placeholder="새 카테고리">
+                                <button class="btn btn-primary" onclick="addCategory()">+</button>
+                            </div>
+                            <div class="category-list" id="categoryList">
+                                <!-- 동적 생성 -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 지식 리스트 -->
+                    <div class="knowledge-list">
+                        <div class="list-header">
+                            <h3>지식 목록 (<span id="listCount">0</span>개)</h3>
+                            <div class="search-box">
+                                <span>🔍</span>
+                                <input type="text" id="searchInput" placeholder="검색..." oninput="searchKnowledge()">
+                            </div>
+                        </div>
+                        <div id="knowledgeItems">
+                            <!-- 동적 생성 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 편집 모달 -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>✏️ 지식 수정</h2>
+                <button class="close-btn" onclick="closeEditModal()">&times;</button>
+            </div>
+            <form id="editForm">
+                <input type="hidden" id="editChunkId">
+                <div class="form-group">
+                    <label for="editTitle">제목</label>
+                    <input type="text" id="editTitle" required>
+                </div>
+                <div class="form-group">
+                    <label for="editContent">내용</label>
+                    <textarea id="editContent" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="editType">유형</label>
+                    <select id="editType">
+                        <option value="concept">📚 개념</option>
+                        <option value="procedure">📋 절차</option>
+                        <option value="fact">📌 사실</option>
+                        <option value="principle">⚡ 원리</option>
+                        <option value="example">💡 예시</option>
+                        <option value="analogy">🔗 비유</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="editTags">태그 (쉼표 구분)</label>
+                    <input type="text" id="editTags">
+                </div>
+                <div class="form-group">
+                    <label for="editTopic">주제</label>
+                    <input type="text" id="editTopic">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">취소</button>
+                    <button type="submit" class="btn btn-primary">저장</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 삭제 확인 모달 -->
+    <div class="modal" id="deleteModal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2>⚠️ 삭제 확인</h2>
+                <button class="close-btn" onclick="closeDeleteModal()">&times;</button>
+            </div>
+            <p style="margin-bottom: var(--spacing-lg);">
+                이 지식과 관련 플래시카드를 삭제하시겠습니까?<br>
+                <strong id="deleteItemTitle"></strong>
+            </p>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeDeleteModal()">취소</button>
+                <button class="btn btn-danger" onclick="confirmDelete()">삭제</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 토스트 알림 -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // 상태
+        let allChunks = [];
+        let filteredChunks = [];
+        let currentFilter = { type: 'all', topic: null, priority: null };
+        let deleteTargetId = null;
+
+        // 유형 아이콘
+        const typeIcons = {
+            'concept': '📚',
+            'procedure': '📋',
+            'fact': '📌',
+            'principle': '⚡',
+            'example': '💡',
+            'analogy': '🔗',
+            'question': '❓'
+        };
+
+        const typeNames = {
+            'concept': '개념',
+            'procedure': '절차',
+            'fact': '사실',
+            'principle': '원리',
+            'example': '예시',
+            'analogy': '비유',
+            'question': '질문'
+        };
+
+        // 초기화
+        document.addEventListener('DOMContentLoaded', () => {
+            loadOverview();
+            loadKnowledgeList();
+            loadCategories();
+        });
+
+        // 개요 로드
+        async function loadOverview() {
+            try {
+                const response = await fetch('/api/knowledge/overview');
+                const result = await response.json();
+
+                if (result.success) {
+                    const data = result.data;
+
+                    document.getElementById('totalChunks').textContent = data.total_chunks;
+                    document.getElementById('totalCards').textContent = data.total_cards;
+                    document.getElementById('totalTopics').textContent = Object.keys(data.by_topic).length;
+                    document.getElementById('totalTypes').textContent = Object.keys(data.by_type).length;
+
+                    // 유형 필터 생성
+                    renderTypeFilters(data.by_type);
+
+                    // 주제 필터 생성
+                    renderTopicFilters(data.by_topic);
+
+                    // 우선순위 필터 생성
+                    renderPriorityFilters(data.by_priority);
+
+                    document.getElementById('countAll').textContent = data.total_chunks;
+                }
+            } catch (error) {
+                console.error('Error loading overview:', error);
+            }
+        }
+
+        // 유형 필터 렌더링
+        function renderTypeFilters(byType) {
+            const container = document.getElementById('typeFilters');
+            let html = `
+                <div class="filter-item active" data-type="all" onclick="filterByType('all')">
+                    <span>📋 전체</span>
+                    <span class="count" id="countAll">0</span>
+                </div>
+            `;
+
+            for (const [type, count] of Object.entries(byType)) {
+                const icon = typeIcons[type] || '📄';
+                const name = typeNames[type] || type;
+                html += `
+                    <div class="filter-item" data-type="${type}" onclick="filterByType('${type}')">
+                        <span>${icon} ${name}</span>
+                        <span class="count">${count}</span>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+
+        // 주제 필터 렌더링
+        function renderTopicFilters(byTopic) {
+            const container = document.getElementById('topicFilters');
+
+            if (Object.keys(byTopic).length === 0) {
+                container.innerHTML = '<p style="color: var(--text-muted); font-size: 0.875rem;">주제 없음</p>';
+                return;
+            }
+
+            let html = '';
+            for (const [topic, count] of Object.entries(byTopic)) {
+                html += `
+                    <div class="filter-item" data-topic="${topic}" onclick="filterByTopic('${topic}')">
+                        <span>📁 ${topic}</span>
+                        <span class="count">${count}</span>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+
+        // 우선순위 필터 렌더링
+        function renderPriorityFilters(byPriority) {
+            const container = document.getElementById('priorityFilters');
+            const priorityNames = {
+                'CRITICAL': '🔴 핵심',
+                'HIGH': '🟠 높음',
+                'MEDIUM': '🟡 보통',
+                'LOW': '🟢 낮음',
+                'OPTIONAL': '⚪ 선택'
+            };
+
+            let html = '';
+            for (const [priority, count] of Object.entries(byPriority)) {
+                const name = priorityNames[priority] || priority;
+                html += `
+                    <div class="filter-item" data-priority="${priority}" onclick="filterByPriority('${priority}')">
+                        <span>${name}</span>
+                        <span class="count">${count}</span>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html || '<p style="color: var(--text-muted); font-size: 0.875rem;">데이터 없음</p>';
+        }
+
+        // 지식 목록 로드
+        async function loadKnowledgeList() {
+            try {
+                let url = '/api/knowledge/list?limit=500';
+                if (currentFilter.type !== 'all') {
+                    url += `&type=${currentFilter.type}`;
+                }
+                if (currentFilter.topic) {
+                    url += `&topic=${currentFilter.topic}`;
+                }
+
+                const response = await fetch(url);
+                const result = await response.json();
+
+                if (result.success) {
+                    allChunks = result.data.chunks;
+                    filteredChunks = [...allChunks];
+                    renderKnowledgeList();
+                }
+            } catch (error) {
+                console.error('Error loading knowledge:', error);
+            }
+        }
+
+        // 지식 목록 렌더링
+        function renderKnowledgeList() {
+            const container = document.getElementById('knowledgeItems');
+            document.getElementById('listCount').textContent = filteredChunks.length;
+
+            if (filteredChunks.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📭</div>
+                        <p>등록된 지식이 없습니다.</p>
+                        <a href="/knowledge" class="btn btn-primary" style="margin-top: 16px;">지식 추가하기</a>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filteredChunks.map(chunk => {
+                const icon = typeIcons[chunk.knowledge_type] || '📄';
+                const tags = chunk.tags || [];
+                const date = chunk.created_at ? new Date(chunk.created_at).toLocaleDateString('ko-KR') : '';
+
+                return `
+                    <div class="knowledge-item" onclick="viewKnowledge('${chunk.chunk_id}')">
+                        <div class="knowledge-type-icon">${icon}</div>
+                        <div class="knowledge-content">
+                            <div class="knowledge-title">${escapeHtml(chunk.title)}</div>
+                            <div class="knowledge-meta">
+                                <span>${typeNames[chunk.knowledge_type] || chunk.knowledge_type}</span>
+                                <span>•</span>
+                                <span>${date}</span>
+                                ${chunk.parent_topic ? `<span>• 📁 ${chunk.parent_topic}</span>` : ''}
+                            </div>
+                        </div>
+                        <div class="knowledge-tags">
+                            ${tags.slice(0, 3).map(tag => `<span class="tag">#${tag}</span>`).join('')}
+                        </div>
+                        <div class="knowledge-actions">
+                            <button class="action-btn" onclick="event.stopPropagation(); editKnowledge('${chunk.chunk_id}')" title="수정">✏️</button>
+                            <button class="action-btn delete" onclick="event.stopPropagation(); deleteKnowledge('${chunk.chunk_id}', '${escapeHtml(chunk.title)}')" title="삭제">🗑️</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 필터 함수들
+        function filterByType(type) {
+            currentFilter.type = type;
+            currentFilter.topic = null;
+            currentFilter.priority = null;
+
+            // UI 업데이트
+            document.querySelectorAll('#typeFilters .filter-item').forEach(el => {
+                el.classList.toggle('active', el.dataset.type === type);
+            });
+            document.querySelectorAll('#topicFilters .filter-item, #priorityFilters .filter-item').forEach(el => {
+                el.classList.remove('active');
+            });
+
+            loadKnowledgeList();
+        }
+
+        function filterByTopic(topic) {
+            currentFilter.topic = topic;
+            currentFilter.type = 'all';
+            currentFilter.priority = null;
+
+            document.querySelectorAll('.filter-item').forEach(el => el.classList.remove('active'));
+            document.querySelector(`[data-topic="${topic}"]`)?.classList.add('active');
+
+            loadKnowledgeList();
+        }
+
+        function filterByPriority(priority) {
+            currentFilter.priority = priority;
+
+            // 클라이언트 사이드 필터링
+            if (priority) {
+                filteredChunks = allChunks.filter(c => c.priority === priority);
+            } else {
+                filteredChunks = [...allChunks];
+            }
+
+            document.querySelectorAll('#priorityFilters .filter-item').forEach(el => {
+                el.classList.toggle('active', el.dataset.priority === priority);
+            });
+
+            renderKnowledgeList();
+        }
+
+        // 검색
+        function searchKnowledge() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+
+            if (!query) {
+                filteredChunks = [...allChunks];
+            } else {
+                filteredChunks = allChunks.filter(chunk =>
+                    chunk.title.toLowerCase().includes(query) ||
+                    chunk.content.toLowerCase().includes(query) ||
+                    (chunk.tags || []).some(tag => tag.toLowerCase().includes(query))
+                );
+            }
+
+            renderKnowledgeList();
+        }
+
+        // 상세 보기
+        function viewKnowledge(chunkId) {
+            editKnowledge(chunkId);
+        }
+
+        // 수정
+        async function editKnowledge(chunkId) {
+            try {
+                const response = await fetch(`/api/knowledge/${chunkId}`);
+                const result = await response.json();
+
+                if (result.success) {
+                    const chunk = result.data;
+
+                    document.getElementById('editChunkId').value = chunkId;
+                    document.getElementById('editTitle').value = chunk.title;
+                    document.getElementById('editContent').value = chunk.content;
+                    document.getElementById('editType').value = chunk.knowledge_type;
+                    document.getElementById('editTags').value = (chunk.tags || []).join(', ');
+                    document.getElementById('editTopic').value = chunk.parent_topic || '';
+
+                    document.getElementById('editModal').classList.add('active');
+                }
+            } catch (error) {
+                console.error('Error loading knowledge:', error);
+                showToast('불러오기 실패', true);
+            }
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+        }
+
+        // 수정 저장
+        document.getElementById('editForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const chunkId = document.getElementById('editChunkId').value;
+            const data = {
+                title: document.getElementById('editTitle').value,
+                content: document.getElementById('editContent').value,
+                knowledge_type: document.getElementById('editType').value,
+                tags: document.getElementById('editTags').value.split(',').map(t => t.trim()).filter(t => t),
+                parent_topic: document.getElementById('editTopic').value || null
+            };
+
+            try {
+                const response = await fetch(`/api/knowledge/${chunkId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    closeEditModal();
+                    showToast('수정 완료!');
+                    loadOverview();
+                    loadKnowledgeList();
+                } else {
+                    showToast('수정 실패', true);
+                }
+            } catch (error) {
+                console.error('Error updating:', error);
+                showToast('수정 실패', true);
+            }
+        });
+
+        // 삭제
+        function deleteKnowledge(chunkId, title) {
+            deleteTargetId = chunkId;
+            document.getElementById('deleteItemTitle').textContent = title;
+            document.getElementById('deleteModal').classList.add('active');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('active');
+            deleteTargetId = null;
+        }
+
+        async function confirmDelete() {
+            if (!deleteTargetId) return;
+
+            try {
+                const response = await fetch(`/api/knowledge/${deleteTargetId}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    closeDeleteModal();
+                    showToast('삭제 완료!');
+                    loadOverview();
+                    loadKnowledgeList();
+                } else {
+                    showToast('삭제 실패', true);
+                }
+            } catch (error) {
+                console.error('Error deleting:', error);
+                showToast('삭제 실패', true);
+            }
+        }
+
+        // 카테고리 관리
+        async function loadCategories() {
+            try {
+                const response = await fetch('/api/categories');
+                const result = await response.json();
+
+                if (result.success) {
+                    renderCategories(result.data);
+                }
+            } catch (error) {
+                console.error('Error loading categories:', error);
+            }
+        }
+
+        function renderCategories(categories) {
+            const container = document.getElementById('categoryList');
+
+            if (categories.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-muted); font-size: 0.875rem;">카테고리 없음</p>';
+                return;
+            }
+
+            container.innerHTML = categories.map(cat => `
+                <div class="category-item">
+                    <span>${cat.icon} ${cat.name}</span>
+                    <button class="action-btn delete" onclick="deleteCategory('${cat.category_id}')" style="width: 24px; height: 24px;">×</button>
+                </div>
+            `).join('');
+        }
+
+        async function addCategory() {
+            const name = document.getElementById('newCategoryName').value.trim();
+            if (!name) return;
+
+            try {
+                const response = await fetch('/api/categories', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    document.getElementById('newCategoryName').value = '';
+                    loadCategories();
+                    showToast('카테고리 추가됨!');
+                }
+            } catch (error) {
+                console.error('Error adding category:', error);
+                showToast('추가 실패', true);
+            }
+        }
+
+        async function deleteCategory(categoryId) {
+            try {
+                const response = await fetch(`/api/categories/${categoryId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    loadCategories();
+                    showToast('카테고리 삭제됨!');
+                }
+            } catch (error) {
+                console.error('Error deleting category:', error);
+            }
+        }
+
+        // 내보내기
+        async function exportData() {
+            try {
+                const response = await fetch('/api/export');
+                const result = await response.json();
+
+                if (result.success) {
+                    const dataStr = JSON.stringify(result.data, null, 2);
+                    const blob = new Blob([dataStr], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `adhd-learning-export-${new Date().toISOString().split('T')[0]}.json`;
+                    a.click();
+
+                    URL.revokeObjectURL(url);
+                    showToast('내보내기 완료!');
+                }
+            } catch (error) {
+                console.error('Error exporting:', error);
+                showToast('내보내기 실패', true);
+            }
+        }
+
+        // 가져오기
+        async function importData(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            try {
+                const text = await file.text();
+                const data = JSON.parse(text);
+
+                const response = await fetch('/api/import', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    const stats = result.data;
+                    showToast(`가져오기 완료! 청크: ${stats.chunks_imported}, 카드: ${stats.cards_imported}`);
+                    loadOverview();
+                    loadKnowledgeList();
+                }
+            } catch (error) {
+                console.error('Error importing:', error);
+                showToast('가져오기 실패', true);
+            }
+
+            input.value = '';
+        }
+
+        // 유틸리티
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast' + (isError ? ' error' : '');
+            toast.classList.add('visible');
+
+            setTimeout(() => {
+                toast.classList.remove('visible');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADHD Learning System - 지식 추가</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .knowledge-page {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: var(--spacing-xl);
+        }
+
+        .page-header {
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .page-header h1 {
+            font-size: 1.75rem;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .page-header p {
+            color: var(--text-secondary);
+        }
+
+        .knowledge-form {
+            background-color: var(--bg-secondary);
+            border-radius: 16px;
+            padding: var(--spacing-xl);
+            border: 1px solid var(--border);
+        }
+
+        .form-group {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: var(--spacing-sm);
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .form-group .hint {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-top: var(--spacing-xs);
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: var(--spacing-md);
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-group textarea {
+            min-height: 150px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        .tags-input-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-sm);
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            min-height: 48px;
+            cursor: text;
+        }
+
+        .tags-input-container:focus-within {
+            border-color: var(--primary);
+        }
+
+        .tag-item {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            padding: var(--spacing-xs) var(--spacing-sm);
+            background-color: var(--primary);
+            color: white;
+            border-radius: 4px;
+            font-size: 0.875rem;
+        }
+
+        .tag-item button {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 0;
+            font-size: 1rem;
+            line-height: 1;
+        }
+
+        .tags-input {
+            flex: 1;
+            min-width: 100px;
+            border: none;
+            background: transparent;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            padding: var(--spacing-xs);
+        }
+
+        .tags-input:focus {
+            outline: none;
+        }
+
+        .type-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--spacing-md);
+        }
+
+        .type-option {
+            padding: var(--spacing-md);
+            background-color: var(--bg-tertiary);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .type-option:hover {
+            border-color: var(--primary);
+        }
+
+        .type-option.selected {
+            border-color: var(--primary);
+            background-color: rgba(99, 102, 241, 0.1);
+        }
+
+        .type-option .type-icon {
+            font-size: 1.5rem;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .type-option .type-name {
+            font-weight: 500;
+        }
+
+        .submit-section {
+            margin-top: var(--spacing-xl);
+            display: flex;
+            gap: var(--spacing-md);
+        }
+
+        .submit-btn {
+            flex: 1;
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-radius: 8px;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .submit-btn.primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .submit-btn.primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .submit-btn.secondary {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .submit-btn.secondary:hover {
+            background-color: var(--border);
+        }
+
+        /* 성공 메시지 */
+        .success-message {
+            display: none;
+            padding: var(--spacing-lg);
+            background-color: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--success);
+            border-radius: 8px;
+            margin-bottom: var(--spacing-xl);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .success-message.visible {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .success-icon {
+            font-size: 1.5rem;
+        }
+
+        .success-content h3 {
+            color: var(--success);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .success-content p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        /* 예시 템플릿 */
+        .templates-section {
+            margin-top: var(--spacing-xl);
+        }
+
+        .templates-section h3 {
+            margin-bottom: var(--spacing-md);
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .templates-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-md);
+        }
+
+        .template-card {
+            padding: var(--spacing-md);
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .template-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .template-card .template-title {
+            font-weight: 500;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .template-card .template-desc {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 사이드바 -->
+        <nav class="sidebar">
+            <div class="logo">
+                <span class="logo-icon">🧠</span>
+                <span class="logo-text">ADHD Learn</span>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="/">
+                        <span class="nav-icon">📊</span>
+                        <span>대시보드</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/review">
+                        <span class="nav-icon">📝</span>
+                        <span>복습</span>
+                    </a>
+                </li>
+                <li class="nav-item active">
+                    <a href="/knowledge">
+                        <span class="nav-icon">💡</span>
+                        <span>지식 추가</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/library">
+                        <span class="nav-icon">📚</span>
+                        <span>라이브러리</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/schedule">
+                        <span class="nav-icon">📅</span>
+                        <span>스케줄</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- 메인 콘텐츠 -->
+        <main class="main-content">
+            <div class="knowledge-page">
+                <div class="page-header">
+                    <h1>💡 새 지식 추가</h1>
+                    <p>배운 내용을 작은 단위로 정리하세요. 자동으로 플래시카드가 생성됩니다.</p>
+                </div>
+
+                <!-- 성공 메시지 -->
+                <div class="success-message" id="successMessage">
+                    <div class="success-icon">✅</div>
+                    <div class="success-content">
+                        <h3>지식이 추가되었습니다!</h3>
+                        <p id="successDetails">플래시카드가 자동 생성되었습니다.</p>
+                    </div>
+                </div>
+
+                <!-- 폼 -->
+                <form class="knowledge-form" id="knowledgeForm">
+                    <div class="form-group">
+                        <label for="title">제목 *</label>
+                        <input type="text" id="title" name="title" placeholder="예: Python의 GIL이란?" required>
+                        <p class="hint">핵심 개념을 간결하게 표현하세요</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="content">내용 *</label>
+                        <textarea id="content" name="content" placeholder="예: GIL(Global Interpreter Lock)은 Python 인터프리터가 한 번에 하나의 스레드만 Python 바이트코드를 실행하도록 하는 뮤텍스입니다..." required></textarea>
+                        <p class="hint">가능한 구체적이고 예시를 포함하세요</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>지식 유형</label>
+                        <div class="type-selector">
+                            <div class="type-option selected" data-type="concept" onclick="selectType('concept')">
+                                <div class="type-icon">📚</div>
+                                <div class="type-name">개념</div>
+                            </div>
+                            <div class="type-option" data-type="procedure" onclick="selectType('procedure')">
+                                <div class="type-icon">📋</div>
+                                <div class="type-name">절차</div>
+                            </div>
+                            <div class="type-option" data-type="fact" onclick="selectType('fact')">
+                                <div class="type-icon">📌</div>
+                                <div class="type-name">사실</div>
+                            </div>
+                            <div class="type-option" data-type="principle" onclick="selectType('principle')">
+                                <div class="type-icon">⚡</div>
+                                <div class="type-name">원리</div>
+                            </div>
+                            <div class="type-option" data-type="example" onclick="selectType('example')">
+                                <div class="type-icon">💡</div>
+                                <div class="type-name">예시</div>
+                            </div>
+                            <div class="type-option" data-type="analogy" onclick="selectType('analogy')">
+                                <div class="type-icon">🔗</div>
+                                <div class="type-name">비유</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>태그</label>
+                        <div class="tags-input-container" onclick="document.getElementById('tagsInput').focus()">
+                            <span class="tag-item" style="display:none;"></span>
+                            <input type="text" class="tags-input" id="tagsInput" placeholder="태그 입력 후 Enter">
+                        </div>
+                        <input type="hidden" id="tags" name="tags">
+                        <p class="hint">관련 키워드를 추가하세요 (예: python, web, database)</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="source">출처 (선택)</label>
+                        <input type="text" id="source" name="source" placeholder="예: Python 공식 문서, 강의명 등">
+                    </div>
+
+                    <div class="submit-section">
+                        <button type="button" class="submit-btn secondary" onclick="clearForm()">
+                            초기화
+                        </button>
+                        <button type="submit" class="submit-btn primary">
+                            💾 저장하기
+                        </button>
+                    </div>
+                </form>
+
+                <!-- 예시 템플릿 -->
+                <div class="templates-section">
+                    <h3>📝 빠른 템플릿</h3>
+                    <div class="templates-grid">
+                        <div class="template-card" onclick="useTemplate('definition')">
+                            <div class="template-title">정의 템플릿</div>
+                            <div class="template-desc">"X란 Y이다" 형식의 정의</div>
+                        </div>
+                        <div class="template-card" onclick="useTemplate('comparison')">
+                            <div class="template-title">비교 템플릿</div>
+                            <div class="template-desc">"X와 Y의 차이점"</div>
+                        </div>
+                        <div class="template-card" onclick="useTemplate('howto')">
+                            <div class="template-title">방법 템플릿</div>
+                            <div class="template-desc">"X를 하는 방법"</div>
+                        </div>
+                        <div class="template-card" onclick="useTemplate('why')">
+                            <div class="template-title">이유 템플릿</div>
+                            <div class="template-desc">"X인 이유는..."</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 상태
+        let selectedType = 'concept';
+        let tags = [];
+
+        // 유형 선택
+        function selectType(type) {
+            selectedType = type;
+            document.querySelectorAll('.type-option').forEach(el => {
+                el.classList.toggle('selected', el.dataset.type === type);
+            });
+        }
+
+        // 태그 입력
+        const tagsInput = document.getElementById('tagsInput');
+        const tagsContainer = tagsInput.parentElement;
+
+        tagsInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const value = tagsInput.value.trim();
+                if (value && !tags.includes(value)) {
+                    addTag(value);
+                }
+                tagsInput.value = '';
+            } else if (e.key === 'Backspace' && !tagsInput.value && tags.length > 0) {
+                removeTag(tags.length - 1);
+            }
+        });
+
+        function addTag(tag) {
+            tags.push(tag);
+            renderTags();
+        }
+
+        function removeTag(index) {
+            tags.splice(index, 1);
+            renderTags();
+        }
+
+        function renderTags() {
+            // 기존 태그 제거
+            tagsContainer.querySelectorAll('.tag-item').forEach(el => el.remove());
+
+            // 새 태그 추가
+            tags.forEach((tag, index) => {
+                const tagEl = document.createElement('span');
+                tagEl.className = 'tag-item';
+                tagEl.innerHTML = `
+                    ${tag}
+                    <button type="button" onclick="removeTag(${index})">&times;</button>
+                `;
+                tagsContainer.insertBefore(tagEl, tagsInput);
+            });
+
+            // hidden input 업데이트
+            document.getElementById('tags').value = tags.join(',');
+        }
+
+        // 폼 제출
+        document.getElementById('knowledgeForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = {
+                title: document.getElementById('title').value,
+                content: document.getElementById('content').value,
+                type: selectedType,
+                tags: tags,
+                source: document.getElementById('source').value
+            };
+
+            try {
+                const response = await fetch('/api/knowledge', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showSuccess(result.data);
+                    clearForm();
+                } else {
+                    alert('저장 실패: ' + (result.error || '알 수 없는 오류'));
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('저장 중 오류가 발생했습니다.');
+            }
+        });
+
+        function showSuccess(data) {
+            const message = document.getElementById('successMessage');
+            const details = document.getElementById('successDetails');
+
+            details.textContent = `우선순위: ${data.priority}, 난이도: ${data.difficulty}/10`;
+            message.classList.add('visible');
+
+            setTimeout(() => {
+                message.classList.remove('visible');
+            }, 5000);
+        }
+
+        function clearForm() {
+            document.getElementById('knowledgeForm').reset();
+            tags = [];
+            renderTags();
+            selectType('concept');
+        }
+
+        // 템플릿
+        const templates = {
+            definition: {
+                title: '____란 무엇인가?',
+                content: '____은(는) ____입니다.\n\n특징:\n- \n- \n\n예시:\n- '
+            },
+            comparison: {
+                title: '____와 ____의 차이점',
+                content: '____:\n- \n- \n\n____:\n- \n- \n\n핵심 차이:\n'
+            },
+            howto: {
+                title: '____하는 방법',
+                content: '1. \n2. \n3. \n\n주의사항:\n- \n\n예시 코드:\n```\n\n```'
+            },
+            why: {
+                title: '왜 ____인가?',
+                content: '____인 이유:\n\n1. \n2. \n3. \n\n결과적으로:'
+            }
+        };
+
+        function useTemplate(type) {
+            const template = templates[type];
+            document.getElementById('title').value = template.title;
+            document.getElementById('content').value = template.content;
+            document.getElementById('title').focus();
+        }
+    </script>
+</body>
+</html>

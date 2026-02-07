@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADHD Learning System - 스케줄</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .schedule-page {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: var(--spacing-xl);
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .page-header h1 {
+            font-size: 1.75rem;
+        }
+
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: var(--spacing-xl);
+        }
+
+        /* 타임라인 */
+        .timeline-card {
+            background-color: var(--bg-secondary);
+            border-radius: 16px;
+            padding: var(--spacing-xl);
+            border: 1px solid var(--border);
+        }
+
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .timeline-date {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: var(--border);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .timeline-item:last-child {
+            padding-bottom: 0;
+            margin-bottom: 0;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -26px;
+            top: 4px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: var(--bg-tertiary);
+            border: 3px solid var(--primary);
+        }
+
+        .timeline-item.break .timeline-dot {
+            border-color: var(--success);
+        }
+
+        .timeline-item.completed .timeline-dot {
+            background-color: var(--success);
+            border-color: var(--success);
+        }
+
+        .timeline-item.current .timeline-dot {
+            animation: pulse 2s infinite;
+        }
+
+        .timeline-time {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .timeline-content {
+            background-color: var(--bg-tertiary);
+            padding: var(--spacing-md);
+            border-radius: 8px;
+        }
+
+        .timeline-item.break .timeline-content {
+            background-color: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--success);
+        }
+
+        .timeline-title {
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .timeline-meta {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .energy-badge {
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        .energy-badge.high {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .energy-badge.medium {
+            background-color: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+        }
+
+        .energy-badge.low {
+            background-color: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        /* 설정 패널 */
+        .settings-card {
+            background-color: var(--bg-secondary);
+            border-radius: 16px;
+            padding: var(--spacing-xl);
+            border: 1px solid var(--border);
+        }
+
+        .settings-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .setting-group {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .setting-group label {
+            display: block;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .time-inputs {
+            display: flex;
+            gap: var(--spacing-sm);
+            align-items: center;
+        }
+
+        .time-inputs input {
+            width: 80px;
+            padding: var(--spacing-sm);
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-primary);
+            text-align: center;
+        }
+
+        .time-inputs input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .time-slot {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .time-slot button {
+            padding: 4px 8px;
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        .time-slot button:hover {
+            color: var(--danger);
+            border-color: var(--danger);
+        }
+
+        .add-slot-btn {
+            width: 100%;
+            padding: var(--spacing-sm);
+            background-color: var(--bg-tertiary);
+            border: 1px dashed var(--border);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .add-slot-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .energy-pattern {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+
+        .energy-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .energy-row span {
+            font-size: 0.875rem;
+        }
+
+        .energy-row select {
+            padding: var(--spacing-xs) var(--spacing-sm);
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            color: var(--text-primary);
+        }
+
+        .generate-btn {
+            width: 100%;
+            padding: var(--spacing-md);
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: var(--spacing-lg);
+            transition: background-color 0.2s ease;
+        }
+
+        .generate-btn:hover {
+            background-color: var(--primary-dark);
+        }
+
+        /* 요약 */
+        .schedule-summary {
+            background-color: var(--bg-tertiary);
+            padding: var(--spacing-lg);
+            border-radius: 8px;
+            margin-top: var(--spacing-lg);
+        }
+
+        .summary-title {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-md);
+        }
+
+        .summary-item {
+            text-align: center;
+        }
+
+        .summary-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .summary-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* 포모도로 미니 설정 */
+        .pomodoro-settings {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-sm);
+        }
+
+        .pomodoro-input {
+            text-align: center;
+        }
+
+        .pomodoro-input label {
+            display: block;
+            font-size: 0.75rem;
+            margin-bottom: 4px;
+        }
+
+        .pomodoro-input input {
+            width: 100%;
+            padding: var(--spacing-sm);
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-primary);
+            text-align: center;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(99, 102, 241, 0); }
+        }
+
+        @media (max-width: 900px) {
+            .schedule-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 사이드바 -->
+        <nav class="sidebar">
+            <div class="logo">
+                <span class="logo-icon">🧠</span>
+                <span class="logo-text">ADHD Learn</span>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="/">
+                        <span class="nav-icon">📊</span>
+                        <span>대시보드</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/review">
+                        <span class="nav-icon">📝</span>
+                        <span>복습</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/knowledge">
+                        <span class="nav-icon">💡</span>
+                        <span>지식 추가</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/library">
+                        <span class="nav-icon">📚</span>
+                        <span>라이브러리</span>
+                    </a>
+                </li>
+                <li class="nav-item active">
+                    <a href="/schedule">
+                        <span class="nav-icon">📅</span>
+                        <span>스케줄</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- 메인 콘텐츠 -->
+        <main class="main-content">
+            <div class="schedule-page">
+                <div class="page-header">
+                    <h1>📅 학습 스케줄</h1>
+                </div>
+
+                <div class="schedule-grid">
+                    <!-- 타임라인 -->
+                    <div class="timeline-card">
+                        <div class="timeline-header">
+                            <div class="timeline-date" id="scheduleDate">오늘의 스케줄</div>
+                        </div>
+
+                        <div class="timeline" id="timeline">
+                            <div class="empty-state" style="text-align: center; padding: 40px;">
+                                <div style="font-size: 3rem; margin-bottom: 16px;">📅</div>
+                                <p style="color: var(--text-secondary);">
+                                    스케줄을 생성하려면 오른쪽 설정을 조정하고<br>
+                                    "스케줄 생성" 버튼을 클릭하세요.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 설정 패널 -->
+                    <div class="settings-card">
+                        <div class="settings-title">⚙️ 스케줄 설정</div>
+
+                        <div class="setting-group">
+                            <label>학습 가능 시간</label>
+                            <div id="timeSlots">
+                                <div class="time-slot">
+                                    <div class="time-inputs">
+                                        <input type="number" value="9" min="0" max="23" class="start-time">
+                                        <span>~</span>
+                                        <input type="number" value="12" min="0" max="23" class="end-time">
+                                        <span>시</span>
+                                    </div>
+                                    <button onclick="removeSlot(this)">×</button>
+                                </div>
+                                <div class="time-slot">
+                                    <div class="time-inputs">
+                                        <input type="number" value="14" min="0" max="23" class="start-time">
+                                        <span>~</span>
+                                        <input type="number" value="17" min="0" max="23" class="end-time">
+                                        <span>시</span>
+                                    </div>
+                                    <button onclick="removeSlot(this)">×</button>
+                                </div>
+                            </div>
+                            <button class="add-slot-btn" onclick="addSlot()">+ 시간대 추가</button>
+                        </div>
+
+                        <div class="setting-group">
+                            <label>에너지 패턴</label>
+                            <div class="energy-pattern">
+                                <div class="energy-row">
+                                    <span>🌅 오전</span>
+                                    <select id="morningEnergy">
+                                        <option value="high" selected>높음</option>
+                                        <option value="medium">보통</option>
+                                        <option value="low">낮음</option>
+                                    </select>
+                                </div>
+                                <div class="energy-row">
+                                    <span>☀️ 오후</span>
+                                    <select id="afternoonEnergy">
+                                        <option value="high">높음</option>
+                                        <option value="medium" selected>보통</option>
+                                        <option value="low">낮음</option>
+                                    </select>
+                                </div>
+                                <div class="energy-row">
+                                    <span>🌙 저녁</span>
+                                    <select id="eveningEnergy">
+                                        <option value="high">높음</option>
+                                        <option value="medium">보통</option>
+                                        <option value="low" selected>낮음</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="setting-group">
+                            <label>포모도로 설정 (분)</label>
+                            <div class="pomodoro-settings">
+                                <div class="pomodoro-input">
+                                    <label>작업</label>
+                                    <input type="number" id="workDuration" value="25" min="10" max="60">
+                                </div>
+                                <div class="pomodoro-input">
+                                    <label>짧은 휴식</label>
+                                    <input type="number" id="shortBreak" value="5" min="1" max="15">
+                                </div>
+                                <div class="pomodoro-input">
+                                    <label>긴 휴식</label>
+                                    <input type="number" id="longBreak" value="15" min="10" max="30">
+                                </div>
+                                <div class="pomodoro-input">
+                                    <label>세션 수</label>
+                                    <input type="number" id="sessionsBeforeLong" value="4" min="2" max="6">
+                                </div>
+                            </div>
+                        </div>
+
+                        <button class="generate-btn" onclick="generateSchedule()">
+                            🎯 스케줄 생성
+                        </button>
+
+                        <div class="schedule-summary" id="scheduleSummary" style="display: none;">
+                            <div class="summary-title">📊 오늘의 요약</div>
+                            <div class="summary-grid">
+                                <div class="summary-item">
+                                    <div class="summary-value" id="totalMinutes">0</div>
+                                    <div class="summary-label">총 학습 시간 (분)</div>
+                                </div>
+                                <div class="summary-item">
+                                    <div class="summary-value" id="totalBlocks">0</div>
+                                    <div class="summary-label">학습 블록</div>
+                                </div>
+                                <div class="summary-item">
+                                    <div class="summary-value" id="totalBreaks">0</div>
+                                    <div class="summary-label">휴식 횟수</div>
+                                </div>
+                                <div class="summary-item">
+                                    <div class="summary-value" id="endTime">-</div>
+                                    <div class="summary-label">예상 종료</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 시간대 추가/제거
+        function addSlot() {
+            const container = document.getElementById('timeSlots');
+            const slot = document.createElement('div');
+            slot.className = 'time-slot';
+            slot.innerHTML = `
+                <div class="time-inputs">
+                    <input type="number" value="18" min="0" max="23" class="start-time">
+                    <span>~</span>
+                    <input type="number" value="20" min="0" max="23" class="end-time">
+                    <span>시</span>
+                </div>
+                <button onclick="removeSlot(this)">×</button>
+            `;
+            container.appendChild(slot);
+        }
+
+        function removeSlot(btn) {
+            const slots = document.querySelectorAll('.time-slot');
+            if (slots.length > 1) {
+                btn.parentElement.remove();
+            }
+        }
+
+        // 스케줄 생성
+        async function generateSchedule() {
+            const slots = [];
+            document.querySelectorAll('.time-slot').forEach(slot => {
+                const start = parseInt(slot.querySelector('.start-time').value);
+                const end = parseInt(slot.querySelector('.end-time').value);
+                if (start < end) {
+                    slots.push([start, end]);
+                }
+            });
+
+            const energyPattern = {
+                morning: document.getElementById('morningEnergy').value,
+                afternoon: document.getElementById('afternoonEnergy').value,
+                evening: document.getElementById('eveningEnergy').value
+            };
+
+            try {
+                const response = await fetch('/api/schedule', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        available_hours: slots,
+                        energy_pattern: energyPattern
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    renderSchedule(result.data);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function renderSchedule(data) {
+            const timeline = document.getElementById('timeline');
+            const blocks = data.blocks || [];
+
+            if (blocks.length === 0) {
+                timeline.innerHTML = '<p style="text-align:center; color: var(--text-muted);">스케줄이 비어있습니다.</p>';
+                return;
+            }
+
+            const taskIcons = {
+                'new_learning': '📚',
+                'review': '📝',
+                'practice': '💻',
+                'reflection': '🤔'
+            };
+
+            const taskNames = {
+                'new_learning': '새 지식 학습',
+                'review': '복습',
+                'practice': '실습',
+                'reflection': '회고/정리'
+            };
+
+            let studyBlocks = 0;
+            let breakBlocks = 0;
+
+            timeline.innerHTML = blocks.map((block, index) => {
+                const startTime = new Date(block.start);
+                const timeStr = startTime.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+
+                if (block.is_break) {
+                    breakBlocks++;
+                    return `
+                        <div class="timeline-item break">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time">${timeStr}</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">
+                                    ☕ 휴식
+                                </div>
+                                <div class="timeline-meta">${block.duration}분</div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    studyBlocks++;
+                    const icon = taskIcons[block.task_type] || '📖';
+                    const name = taskNames[block.task_type] || block.task_type;
+
+                    return `
+                        <div class="timeline-item ${index === 0 ? 'current' : ''}">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time">${timeStr}</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">
+                                    ${icon} ${name}
+                                    <span class="energy-badge ${block.energy_level}">${block.energy_level}</span>
+                                </div>
+                                <div class="timeline-meta">${block.duration}분</div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }).join('');
+
+            // 요약 업데이트
+            document.getElementById('scheduleSummary').style.display = 'block';
+            document.getElementById('totalMinutes').textContent = data.total_study_minutes;
+            document.getElementById('totalBlocks').textContent = studyBlocks;
+            document.getElementById('totalBreaks').textContent = breakBlocks;
+
+            if (blocks.length > 0) {
+                const lastBlock = blocks[blocks.length - 1];
+                const endTime = new Date(lastBlock.end || lastBlock.start);
+                endTime.setMinutes(endTime.getMinutes() + (lastBlock.duration || 0));
+                document.getElementById('endTime').textContent =
+                    endTime.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+            }
+        }
+
+        // 오늘 날짜 표시
+        document.getElementById('scheduleDate').textContent =
+            new Date().toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'long' });
+    </script>
+</body>
+</html>
