@@ -7,17 +7,18 @@ Personal mono-repo for study materials, self-development tools, and learning pro
 ```
 learning-lab/
 ├── courses/              # Academic course study
-│   └── computer-vision/  # Multi-View Geometry (RANSAC, SfM)
+│   └── MVG/              # Multi-View Geometry (RANSAC, SfM)
 ├── tools/                # Self-development & productivity tools
 │   └── adhd-learning-system/  # ADHD-optimized spaced repetition system
-└── docs/                 # Shared documentation
+├── projects/             # Standalone projects (future)
+└── docs/                 # Shared documentation & guides
 ```
 
 ## Courses
 
 | Course | Topics | Status |
 |--------|--------|--------|
-| `computer-vision` | RANSAC, Structure from Motion | In Progress |
+| `MVG` | RANSAC, Structure from Motion | In Progress |
 
 ## Tools
 
@@ -27,6 +28,11 @@ learning-lab/
 
 ## Adding New Projects
 
-- Academic courses: `courses/<subject-name>/`
-- Tools & utilities: `tools/<tool-name>/`
-- Standalone projects: `projects/<project-name>/`
+| Category | Path | Examples |
+|----------|------|----------|
+| Academic courses | `courses/<subject>/` | `courses/NLP/`, `courses/RL/` |
+| Tools & utilities | `tools/<tool-name>/` | `tools/pomodoro/`, `tools/flashcard/` |
+| Standalone projects | `projects/<name>/` | `projects/paper-impl/` |
+| Notes & references | `notes/<topic>/` | `notes/linear-algebra/` |
+
+Each sub-project should have its own `README.md` and `requirements.txt` (if applicable).
