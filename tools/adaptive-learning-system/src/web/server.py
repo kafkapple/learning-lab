@@ -25,7 +25,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 from core.database import Database
 from core.fsrs import FSRS, Card, Rating, State
 from gamification.engine import GamificationEngine
-from adhd.scheduler import ADHDScheduler
+from adaptive.scheduler import AdaptiveScheduler
 
 app = Flask(__name__,
             template_folder='templates',
@@ -36,7 +36,7 @@ CORS(app)
 db = Database()
 fsrs = FSRS()
 gamification = GamificationEngine()
-scheduler = ADHDScheduler()
+scheduler = AdaptiveScheduler()
 
 DEFAULT_USER = "default_user"
 
@@ -786,6 +786,6 @@ def server_error(e):
 
 
 if __name__ == '__main__':
-    print("🌐 ADHD Learning System - Web Dashboard")
+    print("🌐 Adaptive Learning System - Web Dashboard")
     print("   http://localhost:5000")
     app.run(debug=True, port=5000)

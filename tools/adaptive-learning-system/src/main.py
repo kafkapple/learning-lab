@@ -1,5 +1,5 @@
 """
-ADHD 학습 시스템 메인 오케스트레이터
+적응형 학습 시스템 메인 오케스트레이터
 
 모든 모듈을 통합하여 완전한 학습 경험 제공
 """
@@ -16,7 +16,7 @@ import json
 from core.fsrs import FSRS, Card, Rating, State, FSRSParameters
 from core.knowledge import KnowledgeProcessor, KnowledgeChunk, KnowledgeType, Priority
 from core.database import Database
-from adhd.scheduler import ADHDScheduler, WeeklyPlanner, EnergyLevel, TaskType
+from adaptive.scheduler import AdaptiveScheduler, WeeklyPlanner, EnergyLevel, TaskType
 from gamification.engine import GamificationEngine
 
 
@@ -28,7 +28,7 @@ class LearningSession:
         self.db = Database()
         self.fsrs = FSRS()
         self.knowledge = KnowledgeProcessor()
-        self.scheduler = ADHDScheduler()
+        self.scheduler = AdaptiveScheduler()
         self.gamification = GamificationEngine()
 
         # 세션 상태
@@ -173,7 +173,7 @@ class LearningSession:
         stats = self.db.get_statistics(self.user_id)
 
         print("\n" + "="*50)
-        print("🧠 ADHD 학습 시스템 - 세션 시작")
+        print("🧠 적응형 학습 시스템 - 세션 시작")
         print("="*50)
         print(f"\n📊 대시보드")
         print(f"   레벨: {dashboard['level']} ({dashboard['total_xp']} XP)")
@@ -412,7 +412,7 @@ def main():
     """CLI 메인 함수"""
     session = LearningSession()
 
-    print("\n🧠 ADHD 학습 시스템에 오신 것을 환영합니다!")
+    print("\n🧠 적응형 학습 시스템에 오신 것을 환영합니다!")
     print("\n명령어:")
     print("  start    - 학습 세션 시작")
     print("  add      - 새 지식 추가")

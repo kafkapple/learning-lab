@@ -1,9 +1,9 @@
 """
-ADHD 최적화 스케줄러
+적응형 학습 스케줄러
 
 핵심 기능:
 1. 에너지 레벨 기반 태스크 배치
-2. 포모도로 + 하이퍼포커스 관리
+2. 포모도로 + 몰입(Flow) 관리
 3. 우선순위 기반 자동 스케줄링
 4. 시각적 피드백 & 알림
 """
@@ -48,15 +48,15 @@ class TimeBlock:
 @dataclass
 class PomodoroSession:
     """포모도로 세션"""
-    work_duration: int = 25  # ADHD: 기본 25분, 조절 가능
+    work_duration: int = 25  # Focus: 기본 25분, 조절 가능
     short_break: int = 5
     long_break: int = 15
     sessions_before_long_break: int = 4
     current_session: int = 0
 
-    # ADHD 특화 설정
+    # 몰입 특화 설정
     min_work_duration: int = 15  # 최소 집중 시간
-    max_work_duration: int = 45  # 하이퍼포커스 최대 시간
+    max_work_duration: int = 45  # Deep Work 최대 시간
     auto_adjust: bool = True     # 성과에 따라 자동 조정
 
 
@@ -77,14 +77,14 @@ class DailySchedule:
     })
 
 
-class ADHDScheduler:
-    """ADHD 최적화 스케줄러"""
+class AdaptiveScheduler:
+    """적응형 학습 스케줄러"""
 
     def __init__(self):
         self.pomodoro = PomodoroSession()
         self.daily_schedule: Optional[DailySchedule] = None
 
-        # ADHD 최적화 설정
+        # 몰입 최적화 설정
         self.max_new_items_per_day = 20      # 하루 최대 새 항목
         self.max_review_minutes = 60         # 최대 복습 시간
         self.variety_threshold = 3           # 같은 유형 연속 최대 횟수
@@ -231,8 +231,8 @@ class ADHDScheduler:
 
         self.pomodoro.work_duration = new_duration
 
-    def generate_hyperfocus_alert(self, elapsed_minutes: int) -> Optional[str]:
-        """하이퍼포커스 경고 메시지 생성"""
+    def generate_flow_alert(self, elapsed_minutes: int) -> Optional[str]:
+        """Deep Work 경고 메시지 생성"""
         if elapsed_minutes >= self.pomodoro.max_work_duration:
             return f"[경고] {elapsed_minutes}분 연속 작업 중! 휴식이 필요합니다."
         elif elapsed_minutes >= self.pomodoro.max_work_duration - 5:
@@ -259,7 +259,7 @@ class WeeklyPlan:
 class WeeklyPlanner:
     """주간 계획 생성기"""
 
-    def __init__(self, scheduler: ADHDScheduler):
+    def __init__(self, scheduler: AdaptiveScheduler):
         self.scheduler = scheduler
 
     def create_weekly_plan(
@@ -311,7 +311,7 @@ class WeeklyPlanner:
 
 # 사용 예시
 if __name__ == "__main__":
-    scheduler = ADHDScheduler()
+    scheduler = AdaptiveScheduler()
 
     # 일일 스케줄 생성
     today = datetime.now()

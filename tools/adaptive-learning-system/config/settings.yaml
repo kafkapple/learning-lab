@@ -5,8 +5,8 @@ user:
   id: "default_user"
   timezone: "Asia/Seoul"
 
-# ADHD 최적화 설정
-adhd:
+# 적응형 학습 설정
+adaptive:
   # 포모도로 설정
   pomodoro:
     work_duration: 25        # 기본 작업 시간 (분)

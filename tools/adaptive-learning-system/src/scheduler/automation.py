@@ -47,7 +47,7 @@ class NotificationManager:
                 $text[0].AppendChild($xml.CreateTextNode("{title}")) | Out-Null
                 $text[1].AppendChild($xml.CreateTextNode("{message}")) | Out-Null
                 $toast = [Windows.UI.Notifications.ToastNotification]::new($xml)
-                [Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier("ADHD Learning").Show($toast)
+                [Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier("Adaptive Learning").Show($toast)
                 '''
                 subprocess.run(["powershell", "-Command", ps_script], check=True)
 
@@ -324,7 +324,7 @@ class PomodoroTimer:
 if __name__ == "__main__":
     # 알림 테스트
     notifier = NotificationManager()
-    notifier.send_notification("테스트", "ADHD 학습 시스템 알림 테스트입니다!")
+    notifier.send_notification("테스트", "적응형 학습 시스템 알림 테스트입니다!")
 
     # 자동화 설정
     automation = AutomationRunner()

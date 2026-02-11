@@ -9,7 +9,7 @@ learning-lab/
 ├── courses/              # Academic course study
 │   └── MVG/              # Multi-View Geometry (RANSAC, SfM)
 ├── tools/                # Self-development & productivity tools
-│   └── adhd-learning-system/  # ADHD-optimized spaced repetition system
+│   └── adaptive-learning-system/  # Focus-optimized spaced repetition system
 ├── projects/             # Standalone projects (future)
 └── docs/                 # Shared documentation & guides
 ```
@@ -24,7 +24,7 @@ learning-lab/
 
 | Tool | Description |
 |------|-------------|
-| `adhd-learning-system` | FSRS-based learning automation with gamification |
+| `adaptive-learning-system` | FSRS-based learning automation with gamification |
 
 ## Adding New Projects
 

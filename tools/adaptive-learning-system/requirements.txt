@@ -1,4 +1,4 @@
-# ADHD Learning System Dependencies
+# Adaptive Learning System Dependencies
 
 # Core
 pyyaml>=6.0

@@ -1,4 +1,4 @@
-# ADHD 최적화 학습 루틴 가이드
+# 몰입 최적화 학습 루틴 가이드
 
 ## 핵심 원칙
 
@@ -118,7 +118,7 @@
 
 ---
 
-## ADHD 특화 전략
+## 몰입 유지 전략
 
 ### 1. 시작 저항 극복
 ```
@@ -167,10 +167,10 @@
 ### macOS/Linux cron 설정
 ```bash
 # 아침 9시 학습 리마인더
-0 9 * * * cd /path/to/adhd-learning-system && python -c "from src.scheduler.automation import NotificationManager; NotificationManager().send_learning_reminder()"
+0 9 * * * cd /path/to/adaptive-learning-system && python -c "from src.scheduler.automation import NotificationManager; NotificationManager().send_learning_reminder()"
 
 # 저녁 8시 스트릭 경고
-0 20 * * * cd /path/to/adhd-learning-system && python -c "from src.scheduler.automation import NotificationManager; NotificationManager().send_streak_warning(7)"
+0 20 * * * cd /path/to/adaptive-learning-system && python -c "from src.scheduler.automation import NotificationManager; NotificationManager().send_streak_warning(7)"
 ```
 
 ### Python 스케줄러 (항상 실행)
@@ -238,7 +238,7 @@ automation.start()
 
 ```bash
 # 1. 프로젝트 디렉토리로 이동
-cd /path/to/adhd-learning-system
+cd /path/to/adaptive-learning-system
 
 # 2. 의존성 설치
 pip install -r requirements.txt
