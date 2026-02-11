@@ -69,3 +69,31 @@ $$ \min_{\{P_j\}, \{X_i\}} \sum_{j} \sum_{i} v_{ij} \| x_{ij} - \text{proj}(P_j 
 *   $v_{ij}$: 관측 여부 (보이면 1, 안 보이면 0)
 
 이 문제는 변수의 개수가 매우 많은 대규모 비선형 최소제곱 문제(Large-scale Non-linear Least Squares)이며, 보통 희소성(Sparsity)을 활용한 Levenberg-Marquardt 알고리즘(`scipy.optimize.least_squares`)으로 풉니다.
+
+---
+
+## 5. Metric Reconstruction & Absolute Conic (메트릭 복원과 절대 원추곡선)
+
+초기 SfM의 결과는 **Projective Reconstruction**(사영 복원)입니다. 이는 실제 3D 세상과 선형 변환($H$)만큼 왜곡되어 있을 수 있음을 의미합니다. 이를 우리가 아는 유클리드 공간(Metric Space)으로 복원하려면 **Camera Calibration**(카메라 보정) 정보가 필요합니다.
+
+### 5.1 Projective Ambiguity
+$$ x = PX = (PH^{-1})(HX) = \hat{P}\hat{X} $$
+여기서 $H$는 임의의 $4 \times 4$ 호모그라피 행렬입니다. 즉, 어떤 $H$를 곱해도 수식은 성립하므로, 복원된 $X$는 실제 $X$와 다를 수 있습니다.
+
+### 5.2 The Absolute Conic ($\Omega_\infty$)
+Metric 복원을 위한 핵심 개념입니다.
+*   **정의**: 무한대 평면($\pi_\infty$) 상에 존재하는 가상의 원추곡선입니다.
+*   **특징**: 유클리드 변환(회전, 이동)에 대해 불변(Invariant)입니다.
+*   **IAC (Image of the Absolute Conic, $\omega$)**: 절대 원추곡선이 이미지 평면에 투영된 모습은 카메라의 내부 파라미터($K$)와 직접적인 관계가 있습니다.
+
+$$ \omega = (K K^T)^{-1} $$
+
+따라서, 이미지 상에서 $\omega$를 찾아낼 수 있다면, Cholesky 분해를 통해 $K$를 구할 수 있고, 이를 통해 Projective space를 Metric space로 업그레이드할 수 있습니다. 이를 **Self-Calibration**이라고 합니다.
+
+### 5.3 Practical Application
+실제 구현에서는 보통 다음과 같은 제약 조건을 이용해 $K$를 추정합니다:
+*   Square Pixels (픽셀은 정사각형이다)
+*   Principal Point is at center (주점은 이미지 중심이다)
+*   Zero Skew (x, y축은 직교한다)
+
+이러한 제약 조건을 Bundle Adjustment의 Cost Function에 포함시켜, $P$와 $X$뿐만 아니라 $K$까지 함께 최적화하는 것이 현대적인 SfM 파이프라인(예: COLMAP)의 방식입니다.
