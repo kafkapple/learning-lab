@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADHD Learning System - 지식 추가</title>
+    <title>Adaptive Learning System - 지식 추가</title>
     <link rel="stylesheet" href="/static/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -276,18 +277,26 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
+
 <body>
     <div class="app-container">
         <!-- 사이드바 -->
         <nav class="sidebar">
             <div class="logo">
                 <span class="logo-icon">🧠</span>
-                <span class="logo-text">ADHD Learn</span>
+                <span class="logo-text">Adaptive Learn</span>
             </div>
             <ul class="nav-menu">
                 <li class="nav-item">
@@ -350,7 +359,9 @@
 
                     <div class="form-group">
                         <label for="content">내용 *</label>
-                        <textarea id="content" name="content" placeholder="예: GIL(Global Interpreter Lock)은 Python 인터프리터가 한 번에 하나의 스레드만 Python 바이트코드를 실행하도록 하는 뮤텍스입니다..." required></textarea>
+                        <textarea id="content" name="content"
+                            placeholder="예: GIL(Global Interpreter Lock)은 Python 인터프리터가 한 번에 하나의 스레드만 Python 바이트코드를 실행하도록 하는 뮤텍스입니다..."
+                            required></textarea>
                         <p class="hint">가능한 구체적이고 예시를 포함하세요</p>
                     </div>
 
@@ -574,4 +585,5 @@
         }
     </script>
 </body>
+
 </html>

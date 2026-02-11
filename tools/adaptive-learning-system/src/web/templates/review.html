@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADHD Learning System - 복습</title>
+    <title>Adaptive Learning System - 복습</title>
     <link rel="stylesheet" href="/static/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Marked.js for Markdown rendering -->
@@ -44,7 +45,8 @@
             color: var(--text-secondary);
         }
 
-        .review-settings select, .review-settings input {
+        .review-settings select,
+        .review-settings input {
             background-color: var(--bg-tertiary);
             border: 1px solid var(--border);
             border-radius: 4px;
@@ -191,7 +193,9 @@
             width: 100%;
         }
 
-        .markdown-content h1, .markdown-content h2, .markdown-content h3 {
+        .markdown-content h1,
+        .markdown-content h2,
+        .markdown-content h3 {
             margin-top: 0;
             margin-bottom: var(--spacing-md);
             color: var(--text-primary);
@@ -218,7 +222,8 @@
             padding: 0;
         }
 
-        .markdown-content ul, .markdown-content ol {
+        .markdown-content ul,
+        .markdown-content ol {
             text-align: left;
             padding-left: 20px;
             margin: var(--spacing-md) 0;
@@ -242,7 +247,8 @@
             margin: var(--spacing-md) 0;
         }
 
-        .markdown-content th, .markdown-content td {
+        .markdown-content th,
+        .markdown-content td {
             border: 1px solid var(--border);
             padding: var(--spacing-sm);
             text-align: left;
@@ -464,8 +470,15 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* 키보드 단축키 힌트 */
@@ -508,13 +521,14 @@
         }
     </style>
 </head>
+
 <body>
     <div class="app-container">
         <!-- 사이드바 -->
         <nav class="sidebar">
             <div class="logo">
                 <span class="logo-icon">🧠</span>
-                <span class="logo-text">ADHD Learn</span>
+                <span class="logo-text">Adaptive Learn</span>
             </div>
             <ul class="nav-menu">
                 <li class="nav-item">
@@ -1027,4 +1041,5 @@
         }
     </script>
 </body>
+
 </html>
